@@ -62,3 +62,63 @@ def check_order(data):
     
     # 迴圈結束都沒有返回 False，表示沒有連續上升的情況
     return True
+
+
+# import numpy as np
+
+
+def check_monotonicity(data: np.array) -> bool:
+    """
+    檢查輸入的numpy array是否為連續上升或下降。
+    
+    參數：
+    data -- 輸入的numpy array
+    
+    返回值：
+    如果輸入的numpy array為連續上升或下降，則返回False；否則返回True。
+    """
+    
+    # 檢查相鄰是否有相同數值
+    if np.any(data[:-1] == data[1:]):
+        print("資料中有相同數值")
+        # 將相同數值的元素替換成nan
+        data = data.astype(float)
+        data[np.where(data[:-1] == data[1:])[0]+1] = np.nan
+    
+    # 檢查資料是否為連續上升
+    if np.all(np.diff(data) > 0):
+        print("資料為連續上升")
+        return False
+    
+    # 檢查資料是否為連續下降
+    elif np.all(np.diff(data) < 0):
+        print("資料為連續下降")
+        return False
+    
+    # 資料不是連續上升或下降
+    else:
+        print("資料不是連續上升或下降")
+        return True
+
+
+
+
+continuous_rising_integers = np.arange(1, 11)
+print(continuous_rising_integers)
+continuous_descending_integers = np.arange(10, 0, -1)
+print(continuous_descending_integers)
+
+random_integers = np.random.randint(0, 100, 10)
+print(random_integers)
+
+real_data = np.array([1, 3, 2, 7, 8, 6, 8, 6, 5, 5])
+print(real_data)
+ans = check_monotonicity(real_data)
+
+
+
+
+if ans:
+    print('True')
+else:
+    print('False')
