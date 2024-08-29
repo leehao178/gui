@@ -1,0 +1,40 @@
+import fitz  # PyMuPDF
+import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
+
+# 读取PDF文件
+doc = fitz.open("your_design_file.pdf")
+
+# 假设处理第一页
+page = doc.load_page(0)
+
+# 获取页面内容的路径对象（通常是绘图或形状）
+shapes = page.get_drawings()
+
+fig, ax = plt.subplots()
+
+# 迭代页面中的路径对象
+for shape in shapes:
+    for path in shape["items"]:
+        # 获取路径点
+        points = path["points"]
+        operation = path["type"]
+
+        # 如果路径是填充路径或者是边框路径
+        if operation == "l":  # 线段
+            # 获取颜色，假设RGB格式
+            color = shape["color"]
+            r, g, b = [c / 255 for c in color]
+
+            # 创建多边形对象
+            poly = Polygon(points, closed=True, fill=False, edgecolor=(r, g, b))
+            ax.add_patch(poly)
+        elif operation == "h":  # 填充
+            fill_color = shape["fill_color"]
+            if fill_color:
+                r, g, b = [c / 255 for c in fill_color]
+                poly = Polygon(points, closed=True, fill=True, color=(r, g, b))
+                ax.add_patch(poly)
+
+ax.set_aspect('equal')
+plt.show()
