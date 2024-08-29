@@ -1,0 +1,43 @@
+import ezdxf
+import matplotlib.pyplot as plt
+
+# 讀取DXF文件
+doc = ezdxf.readfile('your_design_file.dxf')
+msp = doc.modelspace()
+
+fig, ax = plt.subplots()
+
+# 通用的實體繪製方法
+for entity in msp:
+    # 將實體的顏色取出來，如果沒有設置則使用黑色
+    color = entity.dxf.color if entity.dxf.hasattr('color') else 7
+    
+    if entity.dxftype() == 'LINE':
+        start = entity.dxf.start
+        end = entity.dxf.end
+        ax.plot([start.x, end.x], [start.y, end.y], color=f'C{color}')
+    
+    elif entity.dxftype() == 'CIRCLE':
+        center = entity.dxf.center
+        radius = entity.dxf.radius
+        circle = plt.Circle((center.x, center.y), radius, color=f'C{color}', fill=False)
+        ax.add_artist(circle)
+    
+    elif entity.dxftype() == 'ARC':
+        center = entity.dxf.center
+        radius = entity.dxf.radius
+        start_angle = entity.dxf.start_angle
+        end_angle = entity.dxf.end_angle
+        arc = plt.Arc((center.x, center.y), 2*radius, 2*radius, angle=0,
+                      theta1=start_angle, theta2=end_angle, color=f'C{color}')
+        ax.add_artist(arc)
+    
+    elif entity.dxftype() == 'LWPOLYLINE':
+        points = entity.get_points('xy')
+        ax.plot([p[0] for p in points], [p[1] for p in points], color=f'C{color}')
+    
+    else:
+        print(f"Unknown entity type: {entity.dxftype()}")
+
+ax.set_aspect('equal')
+plt.show()
