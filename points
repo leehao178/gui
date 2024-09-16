@@ -1,0 +1,41 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = pd.read_csv("data.csv", index_col="time")
+
+data["pointvalue"] = data["pointvalue"].astype(float)
+
+
+mean = data["pointvalue"].mean()
+std = data["pointvalue"].std()
+high_sigma = mean + 2 * std
+low_sigma = mean - 2 * std
+
+last_six = data.iloc[-6:]
+
+
+if last_six["pointvalue"].nunique() < 6:
+    last_six = data.iloc[-8:]
+
+
+if last_six["pointvalue"].is_monotonic_increasing or last_six["pointvalue"].is_monotonic_decreasing:
+    print("")
+
+
+if last_six["pointvalue"].iloc[-1] > high_sigma or last_six["pointvalue"].iloc[-1] < low_sigma:
+    print("")
+
+
+plt.plot(data.index, data["pointvalue"])
+plt.axhline(high_sigma, color="r", linestyle="--", label="2 High Sigma")
+plt.axhline(low_sigma, color="g", linestyle="--", label="2 Low Sigma")
+plt.xlabel("Time")
+plt.ylabel("Point Value")
+plt.title("Point Value vs Time")
+plt.legend()
+plt.show()
+
+
+
+
+
